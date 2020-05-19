@@ -1,0 +1,14 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    text-align: center;
+    background-color: #888888;
+    color: white;
+}
+
+div {
+    text-align: left;
+}
