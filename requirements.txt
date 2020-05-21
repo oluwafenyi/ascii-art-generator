@@ -1,0 +1,15 @@
+click==7.1.2
+colour==0.1.5
+flake8==3.8.1
+Flask==1.1.2
+Flask-WTF==0.14.3
+itsdangerous==1.1.0
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+mccabe==0.6.1
+numpy==1.18.4
+Pillow==7.1.2
+pycodestyle==2.6.0
+pyflakes==2.2.0
+Werkzeug==1.0.1
+WTForms==2.3.1
