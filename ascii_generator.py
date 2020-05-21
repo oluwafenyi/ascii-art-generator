@@ -57,7 +57,7 @@ def pixels_to_chars(image: Image, pixel_levity: float = 1.0) -> list:
     return chars
 
 
-def _draw_image(image: Image, chars: list, gradient_range: list) -> Image:
+def _draw_image_ttb(image: Image, chars: list, gradient: tuple) -> Image:
     """
     Internal function to draw ascii characters on white background.
     :params image: -> PIL.Image
@@ -66,11 +66,46 @@ def _draw_image(image: Image, chars: list, gradient_range: list) -> Image:
     :returns image: image is return after drawing process is complete
     """
 
+    from_, to = gradient
+    gradient_range = list(Color(from_).range_to(Color(to), len(chars)))
+
     draw = ImageDraw.Draw(image)
     cursor = 0
     for i, line in enumerate(chars):
         color = gradient_range[i]
         draw.text((0, cursor), line, color.hex, font=FONT)
+        cursor += CHAR_HEIGHT
+    return image
+
+
+def _draw_image_ltr(image: Image, chars: list, gradient: tuple) -> Image:
+    """
+    Internal function to draw ascii characters on white background.
+    gradient from left to right. Generally slower than its counterpart
+    :params image: -> PIL.Image
+    :params chars: -> list of rows of strings to be drawn
+    :params gradient: -> list of colour.Color objects in gradient range
+    :returns image: image is return after drawing process is complete
+    """
+
+    from_, to = gradient
+    gradient_range = list(Color(from_).range_to(Color(to), len(chars[0])))
+
+    draw = ImageDraw.Draw(image)
+
+    cursor = 0
+    for i, line in enumerate(chars):
+        pix = 0
+        cursor_x = 0
+        for _, char in enumerate(line):
+            try:
+                color = gradient_range[pix]
+            except IndexError:
+                pix = 0
+                color = gradient_range[pix]
+            pix += 1
+            draw.text((cursor_x, cursor), char, color.hex, font=FONT)
+            cursor_x += CHAR_WIDTH
         cursor += CHAR_HEIGHT
     return image
 
@@ -105,19 +140,10 @@ def generate_image(
         CHAR_WIDTH * image.width, CHAR_HEIGHT * image.height
     new_image = Image.new('RGBA', (new_width, new_height), 'white')
 
-    from_, to = gradient
-    gradient_range = list(Color(from_).range_to(Color(to), len(chars)))
-
     if gradient_style == 'ttb':
-        new_image = _draw_image(new_image, chars, gradient_range)
+        new_image = _draw_image_ttb(new_image, chars, gradient)
 
     elif gradient_style == 'ltr':
-        new_chars = []
-        for y in range(len(chars)):
-            line = ''
-            for x in range(len(chars[y])):
-                line += chars[y][x]
-            new_chars.append(line)
-        new_image = _draw_image(new_image, new_chars, gradient_range)
+        new_image = _draw_image_ltr(new_image, chars, gradient)
 
     new_image.save(os.path.join(TEMP_FOLDER, 'ascii_art.png'))

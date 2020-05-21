@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm as Form
 from wtforms import IntegerField
 from wtforms.widgets.html5 import NumberInput
 
-from ascii_generator import generate_ascii_image
+from ascii_generator import generate_image
 
 
 TEMP_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'temp')
@@ -58,7 +58,7 @@ def index():
 
         form = ASCIIGenerationForm(formdata=request.form)
         if form.validate_on_submit():
-            image_text = generate_ascii_image(
+            image_text = generate_image(
                 path,
                 desired_width=form.desired_width.data,
                 range_width=form.range_width.data,
