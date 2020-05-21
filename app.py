@@ -11,6 +11,9 @@ from ascii_generator import generate_ascii_image
 
 
 TEMP_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'temp')
+if not os.path.exists(TEMP_FOLDER):
+    os.mkdir(TEMP_FOLDER)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 
