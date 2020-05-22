@@ -5,22 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASCII Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
-    <header>
-        <h1>ASCII Art Generator</h1>
-    </header>
     <main>
+        <div id="display">
+            <label for="image_file" class="image-upload">
+                <div class="canvas">
+                    <div>
+                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-white svg-inline--fa fa-camera fa-w-16"><path fill="#fff" d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z" class=""></path></svg>
+                    </div>
+                </div>
+            </label>
+        </div>
         <form action="" method="post">
             {{ form.csrf_token }}
-            <label for="image_file"></label>
-            <input type="file" name="image_file" id="image_file">
-            {{ form.range_width.label }} {{ form.range_width }}
-            {{ form.desired_width.label }} {{ form.desired_width }}
+            <input hidden="hidden" type="file" name="image_file" id="image_file" accept="image/*">
+            <div class='slider-container'>
+                {{ form.scaling_factor(min=1, max=100, value=50, id='sf') }}
+                {{ form.scaling_factor.label(class='slider-label') }}
+            </div>
+            <div class='slider-container'>
+                {{ form.pixel_levity(min=1, max=100, value=50, id='pl') }}
+                {{ form.pixel_levity.label(class='slider-label') }}
+            </div>
         </form>
-        <div id="output">
-
-        </div>
     </main>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>

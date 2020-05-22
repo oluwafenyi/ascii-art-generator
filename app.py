@@ -1,11 +1,14 @@
 import os
+import shutil
 
 from flask import (
-    Flask, render_template, request, jsonify, redirect, session, url_for
+    Flask, render_template, request, jsonify, redirect, session, url_for,
+    make_response
 )
 from flask_wtf import FlaskForm as Form
-from wtforms import IntegerField
-from wtforms.widgets.html5 import NumberInput
+from wtforms import FloatField
+from wtforms.validators import NumberRange
+from wtforms.widgets.core import HTMLString, html_params
 
 from ascii_generator import generate_image
 
@@ -13,6 +16,9 @@ from ascii_generator import generate_image
 TEMP_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'temp')
 if not os.path.exists(TEMP_FOLDER):
     os.mkdir(TEMP_FOLDER)
+
+STATIC_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)), 'static')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -22,12 +28,28 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config['UPLOAD_FOLDER'] = TEMP_FOLDER
 
 
+class SliderWidget:
+
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault('type', 'submit')
+        title = kwargs.pop('title', field.description or '')
+        params = html_params(title=title, **kwargs)
+
+        html = '<div class="slidecontainer"><input type="range" %s'\
+            'class="slider"></div>'
+        return HTMLString(html % params)
+
+
 class ASCIIGenerationForm(Form):
-    range_width = IntegerField(
-        'range width', default=25, widget=NumberInput(1, 10, 40)
+    scaling_factor = FloatField(
+        validators=[NumberRange(0.01, 1)],
+        default=0.5,
+        widget=SliderWidget()
     )
-    desired_width = IntegerField(
-        'desired width', default=120, widget=NumberInput(10, 50, 300)
+    pixel_levity = FloatField(
+        validators=[NumberRange(0.1, 2)],
+        default=1,
+        widget=SliderWidget()
     )
 
 
@@ -58,12 +80,19 @@ def index():
 
         form = ASCIIGenerationForm(formdata=request.form)
         if form.validate_on_submit():
-            image_text = generate_image(
+            image_path = generate_image(
                 path,
-                desired_width=form.desired_width.data,
-                range_width=form.range_width.data,
+                scaling_factor=form.scaling_factor.data,
+                pixel_levity=form.pixel_levity.data
             )
-            return jsonify({'image_text': image_text, 'session': True}), 200
+            shutil.move(
+                image_path, os.path.join(STATIC_FOLDER, 'ascii_art.png'))
+            image_url = url_for('static', filename='ascii_art.png')
+            res = make_response(
+                jsonify({'image_url': image_url, 'session': True}), 200)
+            res.headers['Cache-Control'] = 'no-cache, no-store,'\
+                ' must-revalidate'
+            return res
         else:
             errors = form.errors
             return jsonify({'detail': errors}), 400

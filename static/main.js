@@ -1,49 +1,48 @@
 
 const imageFileField = document.getElementById('image_file');
-const rangeWidthField = document.getElementById('range_width');
-const desiredWidthField = document.getElementById('desired_width');
-const token = document.getElementById('csrf_token');
+const scalingFactor = document.getElementById('sf');
+const pixelLevity = document.getElementById('pl')
 
-const output = document.getElementById('output');
+const token = document.getElementById('csrf_token');
+const display = document.querySelector('.canvas');
 
 const data = new FormData()
-data.append('range_width', rangeWidthField.value);
-data.append('desired_width', desiredWidthField.value);
+data.append('scaling_factor', scalingFactor.value * 0.01);
+data.append('pixel_levity', pixelLevity.value * 0.02);
 data.append('csrf_token', token.value);
 
 const postForm = () => {
     fetch('/', { method: 'POST', body: data })
         .then(response => response.json())
         .then(response => {
-            const imageText = response.image_text;
+            const imageURL = response.image_url;
             const session = response.session;
+            const time = new Date().getTime();
             data.append('session', session);
-            output.innerHTML = imageText;
+            display.style.backgroundImage = `url("${imageURL + '?rand=' + time}") no-repeat`;
         })
         .catch((err) => {
-            output.innerHTML = 'An error has occurred';
-            console.log(err)
+            console.log(err);
         });
 };
-
 
 imageFileField.addEventListener('change', (e) => {
     data.append('image_file', e.target.files[0]);
     postForm();
 });
 
-rangeWidthField.addEventListener('change', (e) => {
-    data.set('range_width', e.target.value);
+scalingFactor.addEventListener('input', (e) => {
+    const scale = 0.01;
+    data.set('scaling_factor', e.target.value * scale);
     if (data.image_file || data.get('session')) {
-        output.innerHTML = ''
         postForm();
     }
-});
+})
 
-desiredWidthField.addEventListener('change', (e) => {
-    data.set('desired_width', e.target.value);
+pixelLevity.addEventListener('input', (e) => {
+    const scale = 0.02;
+    data.set('pixel_levity', e.target.value * scale);
     if (data.image_file || data.get('session')) {
-        output.innerHTML = ''
         postForm();
     }
-});
+})

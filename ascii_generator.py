@@ -127,6 +127,7 @@ def generate_image(
         hex codes, same color in for solid color output
     :params gradient_style: of of ttb or ltr, meaning top to bottom and left to
         right respectively
+    :returns path: path of generated image
     """
 
     if gradient_style not in ('ltr', 'ttb'):
@@ -146,4 +147,6 @@ def generate_image(
     elif gradient_style == 'ltr':
         new_image = _draw_image_ltr(new_image, chars, gradient)
 
-    new_image.save(os.path.join(TEMP_FOLDER, 'ascii_art.png'))
+    path = os.path.join(TEMP_FOLDER, 'ascii_art.png')
+    new_image.save(path)
+    return path
