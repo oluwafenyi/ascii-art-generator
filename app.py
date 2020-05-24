@@ -1,4 +1,5 @@
 import os
+from threading import Timer
 
 from flask import (
     Flask, render_template, request, jsonify, redirect, session, url_for)
@@ -39,15 +40,22 @@ def allowed_file(filename):
     return '.' in filename and get_extension(filename) in ALLOWED_EXTENSIONS
 
 
+def delete_file(path):
+    os.unlink(path)
+
+
 @app.route('/', methods=('GET', 'POST'))
 def index():
     if request.method == 'POST':
         f = request.files.get('image_file')
         if f and allowed_file(f.filename):
-            ext = get_extension(f.filename)
-            filename = f'temp.{ext}'
+            # ext = get_extension(f.filename)
+            # filename = f'temp.{ext}'
+            filename = f.filename
             session['filename'] = filename
             path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            delete_upload_task = Timer(600, delete_file, (path,))
+            delete_upload_task.start()
             f.save(path)
         elif session.get('filename'):
             path = os.path.join(
@@ -58,15 +66,24 @@ def index():
 
         form = ASCIIGenerationForm(formdata=request.form)
         if form.validate_on_submit():
-            generate_image(
-                path,
-                scaling_factor=form.scaling_factor.data,
-            )
-            image_url = url_for('static', filename='ascii_art.png')
+            try:
+                path, filename = generate_image(
+                    path,
+                    scaling_factor=form.scaling_factor.data,
+                )
+            except FileNotFoundError:
+                error = 'image does not exist, please reupload'
+                return jsonify({'detail': error}), 404
+
+            delete_generated_task = Timer(300, delete_file, (path,))
+            delete_generated_task.start()
+            image_url = url_for('static', filename=filename)
             return jsonify({'image_url': image_url, 'session': True}), 200
+
         else:
             errors = form.errors
             return jsonify({'detail': errors}), 400
+
     else:
         form = ASCIIGenerationForm()
     return render_template('index.html', form=form)

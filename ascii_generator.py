@@ -1,4 +1,5 @@
 import os
+from base64 import b64encode
 
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
@@ -130,6 +131,9 @@ def generate_image(
     if gradient_style not in ('ltr', 'ttb'):
         raise ValueError('gradient_style should be one of "ltr" or "ttb"')
 
+    if not os.path.exists(path):
+        raise FileNotFoundError('file does not exist')
+
     image = Image.open(path)
     image = resize_image(image, scaling_factor=scaling_factor)
     chars = pixels_to_chars(image)
@@ -144,6 +148,8 @@ def generate_image(
     elif gradient_style == 'ltr':
         new_image = _draw_image_ltr(new_image, chars, gradient)
 
-    path = os.path.join(STATIC_FOLDER, 'ascii_art.png')
+    rand = b64encode(os.urandom(8)).decode('utf-8').replace('.', '')
+    filename = 'ascii_art_' + rand + '.png'
+    path = os.path.join(STATIC_FOLDER, filename)
     new_image.save(path)
-    return path
+    return path, filename
