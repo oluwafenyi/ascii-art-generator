@@ -6,31 +6,34 @@
     <title>ASCII Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <script src={{ url_for('static', filename='vue.js') }}></script>
 </head>
 <body>
-    <main>
-        <div id="display">
-            <label for="image_file" class="image-upload">
-                <div class="canvas">
-                    <div>
-                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-white svg-inline--fa fa-camera fa-w-16"><path fill="#fff" d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z" class=""></path></svg>
+    <div id="app">
+        <main>
+            <div id="display">
+                <label for="image_file" class="image-upload">
+                    <div class="canvas" :style="background">
+                        <div>
+                            <svg v-if="!imageURL" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="camera" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-white svg-inline--fa fa-camera fa-w-16"><path fill="#fff" d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z" class=""></path></svg>
+                        </div>
                     </div>
-                </div>
-            </label>
-        </div>
-        <form action="" method="post">
-            {{ form.csrf_token }}
-            <input hidden="hidden" type="file" name="image_file" id="image_file" accept="image/*">
-            <div class='slider-container'>
-                {{ form.scaling_factor(min=1, max=100, value=50, id='sf') }}
-                {{ form.scaling_factor.label(class='slider-label') }}
+                </label>
+                <form action="" method="post">
+                    {{ form.csrf_token }}
+                    <input hidden="hidden" type="file" name="image_file" id="image_file" accept="image/*">
+                    <div class='slider-container'>
+                        <div class="slidecontainer"><input type="range" min="1" max="100" value="50" id="scaling_factor" name="scaling_factor" class="slider"></div>
+                        <label for="scaling_factor" class="slider-label">Scaling Factor</label>
+                    </div>
+                    <div class="actions">
+                        <button @click.prevent="postImage" class="button" :disabled="!imageFile || !session" :class="{disabled: !imageFile || !session}">Generate</button>
+                        <a :href="imageURL" download="ascii_art.png" class="button" :class="{disabled: !imageURL}">Download</a>
+                    </div>
+                </form>
             </div>
-            <div class='slider-container'>
-                {{ form.pixel_levity(min=1, max=100, value=50, id='pl') }}
-                {{ form.pixel_levity.label(class='slider-label') }}
-            </div>
-        </form>
-    </main>
+        </main>
+    </div>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>

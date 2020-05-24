@@ -5,9 +5,10 @@ from PIL import Image, ImageFont, ImageDraw
 from colour import Color
 
 
-TEMP_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'temp')
-if not os.path.exists(TEMP_FOLDER):
-    os.mkdir(TEMP_FOLDER)
+STATIC_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                             'static')
+if not os.path.exists(STATIC_FOLDER):
+    os.mkdir(STATIC_FOLDER)
 
 FONT = ImageFont.load_default()
 CHAR_WIDTH, CHAR_HEIGHT = FONT.getsize('a')
@@ -39,18 +40,16 @@ def resize_image(image: Image, scaling_factor: float = 0.5) -> Image:
     return image
 
 
-def pixels_to_chars(image: Image, pixel_levity: float = 1.0) -> list:
+def pixels_to_chars(image: Image) -> list:
     """
     function for pixel to character conversion
     :params image: PIL.Image
-    :params pixel_levity: this darkens or lightens the image, where  > 1 is
-        brighter and < 1 is darker
     :returns chars: list of strings
     """
 
     pixel_values = np.sum(np.asarray(image), axis=2)
     pixel_values -= pixel_values.min()
-    pixel_values = (1.0 - pixel_values / pixel_values.max()) ** pixel_levity
+    pixel_values = (1.0 - pixel_values / pixel_values.max())
     pixel_values = (pixel_values * (ASCII_CHARS.size - 1)).astype(int)
     chars = ('\n'.join(''.join(r) for r in ASCII_CHARS[pixel_values]))\
         .split('\n')
@@ -113,16 +112,14 @@ def _draw_image_ltr(image: Image, chars: list, gradient: tuple) -> Image:
 def generate_image(
     path: str,
     scaling_factor: float = 0.5,
-    pixel_levity: float = 1.0,
     gradient=('black', 'black'),
     gradient_style='ttb'
-):
+) -> str:
     """
     main function for image generation, picture is stored in a temp folder
     adjacent this script
     :params path: path to the image
     :params scaling_factor: float
-    :params pixel_levity: float
     :params gradient: tuple of length two containing strings of color names or
         hex codes, same color in for solid color output
     :params gradient_style: of of ttb or ltr, meaning top to bottom and left to
@@ -135,7 +132,7 @@ def generate_image(
 
     image = Image.open(path)
     image = resize_image(image, scaling_factor=scaling_factor)
-    chars = pixels_to_chars(image, pixel_levity=pixel_levity)
+    chars = pixels_to_chars(image)
 
     new_width, new_height = \
         CHAR_WIDTH * image.width, CHAR_HEIGHT * image.height
@@ -147,6 +144,6 @@ def generate_image(
     elif gradient_style == 'ltr':
         new_image = _draw_image_ltr(new_image, chars, gradient)
 
-    path = os.path.join(TEMP_FOLDER, 'ascii_art.png')
+    path = os.path.join(STATIC_FOLDER, 'ascii_art.png')
     new_image.save(path)
     return path

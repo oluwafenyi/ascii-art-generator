@@ -1,48 +1,56 @@
 
-const imageFileField = document.getElementById('image_file');
-const scalingFactor = document.getElementById('sf');
-const pixelLevity = document.getElementById('pl')
 
-const token = document.getElementById('csrf_token');
-const display = document.querySelector('.canvas');
-
-const data = new FormData()
-data.append('scaling_factor', scalingFactor.value * 0.01);
-data.append('pixel_levity', pixelLevity.value * 0.02);
-data.append('csrf_token', token.value);
-
-const postForm = () => {
-    fetch('/', { method: 'POST', body: data })
-        .then(response => response.json())
-        .then(response => {
-            const imageURL = response.image_url;
-            const session = response.session;
-            const time = new Date().getTime();
-            data.append('session', session);
-            display.style.backgroundImage = `url("${imageURL + '?rand=' + time}") no-repeat`;
-        })
-        .catch((err) => {
-            console.log(err);
+var vue = new Vue({
+    el: '#display',
+    delimiters: ['[[', ']]'],
+    data: function() {
+        return {
+            imageFile: null,
+            csrfToken: '',
+            scalingFactor: 0.5,
+            imageURL: null,
+            session: false,
+            background: '',
+        }
+    },
+    mounted: function() {
+        this.csrfToken = document.getElementById('csrf_token').value;
+        var self = this;
+        document.getElementById('image_file').addEventListener('change', function(e) {
+            self.imageFile = e.target.files[0];
+            self.imageURL = URL.createObjectURL(self.imageFile);
+            self.session = false;
         });
-};
+        document.getElementById('scaling_factor').addEventListener('input', function(e) {
+            self.scalingFactor = e.target.value * 0.01;
+        });
+    },
+    methods: {
+        postImage: function() {
+            var data = new FormData()
+            data.append('csrf_token', this.csrfToken);
+            data.append('scaling_factor', this.scalingFactor);
+            data.append('image_file', this.imageFile);
 
-imageFileField.addEventListener('change', (e) => {
-    data.append('image_file', e.target.files[0]);
-    postForm();
+            var self = this;
+            fetch('/', { method: 'POST', body: data })
+            .then(response => response.json())
+            .then(response => {
+                var imageURL = response.image_url;
+                self.session = response.session;
+                self.imageURL = imageURL + '?rand=' + new Date().getTime();
+            })
+            .catch((err) => {
+                alert('An error has occurred');
+            });
+        }
+    },
+    watch: {
+        imageURL: function() {
+            if (!this.imageURL) return;
+            this.background = {
+                backgroundImage: `url(${this.imageURL})`,
+            }
+        },
+    },
 });
-
-scalingFactor.addEventListener('input', (e) => {
-    const scale = 0.01;
-    data.set('scaling_factor', e.target.value * scale);
-    if (data.image_file || data.get('session')) {
-        postForm();
-    }
-})
-
-pixelLevity.addEventListener('input', (e) => {
-    const scale = 0.02;
-    data.set('pixel_levity', e.target.value * scale);
-    if (data.image_file || data.get('session')) {
-        postForm();
-    }
-})

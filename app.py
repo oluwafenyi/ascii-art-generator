@@ -1,14 +1,10 @@
 import os
-import shutil
 
 from flask import (
-    Flask, render_template, request, jsonify, redirect, session, url_for,
-    make_response
-)
+    Flask, render_template, request, jsonify, redirect, session, url_for)
 from flask_wtf import FlaskForm as Form
 from wtforms import FloatField
 from wtforms.validators import NumberRange
-from wtforms.widgets.core import HTMLString, html_params
 
 from ascii_generator import generate_image
 
@@ -28,28 +24,10 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config['UPLOAD_FOLDER'] = TEMP_FOLDER
 
 
-class SliderWidget:
-
-    def __call__(self, field, **kwargs):
-        kwargs.setdefault('type', 'submit')
-        title = kwargs.pop('title', field.description or '')
-        params = html_params(title=title, **kwargs)
-
-        html = '<div class="slidecontainer"><input type="range" %s'\
-            'class="slider"></div>'
-        return HTMLString(html % params)
-
-
 class ASCIIGenerationForm(Form):
     scaling_factor = FloatField(
         validators=[NumberRange(0.01, 1)],
         default=0.5,
-        widget=SliderWidget()
-    )
-    pixel_levity = FloatField(
-        validators=[NumberRange(0.1, 2)],
-        default=1,
-        widget=SliderWidget()
     )
 
 
@@ -80,19 +58,12 @@ def index():
 
         form = ASCIIGenerationForm(formdata=request.form)
         if form.validate_on_submit():
-            image_path = generate_image(
+            generate_image(
                 path,
                 scaling_factor=form.scaling_factor.data,
-                pixel_levity=form.pixel_levity.data
             )
-            shutil.move(
-                image_path, os.path.join(STATIC_FOLDER, 'ascii_art.png'))
             image_url = url_for('static', filename='ascii_art.png')
-            res = make_response(
-                jsonify({'image_url': image_url, 'session': True}), 200)
-            res.headers['Cache-Control'] = 'no-cache, no-store,'\
-                ' must-revalidate'
-            return res
+            return jsonify({'image_url': image_url, 'session': True}), 200
         else:
             errors = form.errors
             return jsonify({'detail': errors}), 400
