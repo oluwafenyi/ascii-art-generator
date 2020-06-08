@@ -1,4 +1,5 @@
 
+Vue.use(VueLoading);
 
 var vue = new Vue({
     el: '#display',
@@ -27,6 +28,10 @@ var vue = new Vue({
     },
     methods: {
         postImage: function() {
+            var loader = this.$loading.show({
+                container: null,
+                canCancel: false,
+            });
             var data = new FormData()
             data.append('csrf_token', this.csrfToken);
             data.append('scaling_factor', this.scalingFactor);
@@ -39,11 +44,13 @@ var vue = new Vue({
                 var imageURL = response.image_url;
                 self.session = response.session;
                 self.imageURL = imageURL + '?rand=' + new Date().getTime();
+                loader.hide();
             })
             .catch((err) => {
+                loader.hide();
                 alert('An error has occurred');
             });
-        }
+        },
     },
     watch: {
         imageURL: function() {

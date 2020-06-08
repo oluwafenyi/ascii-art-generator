@@ -7,8 +7,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <script src={{ url_for('static', filename='vue.min.js') }}></script>
+    <script src="{{ url_for('static', filename='vue-loading-overlay.js') }}"></script>
+    <link href="{{ url_for('static', filename='vue-loading.css') }}" rel="stylesheet">
 </head>
 <body>
+    <noscript>
+        <p>This app requires javascript enabled to function</p>
+    </noscript>
     <div id="app">
         <main>
             <div id="display">

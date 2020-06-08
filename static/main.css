@@ -18,8 +18,9 @@ div#display {
 }
 
 .canvas {
-    height: 420px;
-    width: 840px;
+    height: 26rem;
+    width: 80vw;
+    max-width: 664px;
     border: 6px solid white;
     display: block;
     border-radius: 5px;
@@ -35,10 +36,10 @@ div#display {
 }
 
 svg {
-    height: 20px;
-    width: 20px;
+    height: 1.25rem;
+    width: 1.25rem;
     position: absolute;
-    top: calc(240px - 20px - 6px);
+    top: calc(13rem - 1.25rem - 6px);
 }
 
 form {
@@ -52,8 +53,8 @@ label.image-upload {
 }
 
 .slider-container {
-    margin: 0 6px;
-    margin-top: 36px;
+    margin: 0 1.25rem;
+    margin-top: 2.25rem;
     display: inline-block;
     text-align: center;
     vertical-align: middle;
@@ -65,13 +66,13 @@ label.image-upload {
 
 .slidecontainer {
     display: inline-block;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .slider {
     -webkit-appearance: none;
-    width: 240px;
-    height: 8px;
+    width: 15rem;
+    height: 0.5rem;
     border-radius: 2px;
     background: white;
     outline: none;
@@ -83,16 +84,16 @@ label.image-upload {
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     border-radius: 50%;
     background: #4CAF50;
     cursor: pointer;
   }
 
   .slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     border-radius: 50%;
     background: #4CAF50;
     cursor: pointer;
@@ -101,13 +102,13 @@ label.image-upload {
 .actions {
     display: inline-block;
     text-align: right;
-    width: calc(100% - 270px);
+    width: calc(100% - 15rem - 1.25rem - 1.25rem - 1.5rem);
     vertical-align: middle;
 }
 
 .button {
-    margin: 0 6px;
-    padding: 4px 8px;
+    margin: 0 0.375rem;
+    padding: 0.25rem 0.5rem;
     background: #4CAF50;
     border-radius: 5px;
     border: 1px solid transparent;
@@ -127,4 +128,31 @@ label.image-upload {
 .disabled {
     background: rgba(76, 175, 80, .3);
     cursor: default;
+}
+
+@media (max-width: 502px){
+    form {
+        text-align: center;
+    }
+
+    .canvas {
+        margin: auto;
+        width: 90vw;
+    }
+
+    .slider-container {
+        display: block;
+    }
+
+    .actions {
+        display: block;
+        width: 90vw;
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .button {
+        margin: 0 1rem;
+    }
+
 }
