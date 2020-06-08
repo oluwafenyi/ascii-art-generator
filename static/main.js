@@ -41,9 +41,11 @@ var vue = new Vue({
             fetch('/', { method: 'POST', body: data })
             .then(response => response.json())
             .then(response => {
-                var imageURL = response.image_url;
-                self.session = response.session;
-                self.imageURL = imageURL + '?rand=' + new Date().getTime();
+                if (response.status != 404) {
+                    var imageURL = response.image_url;
+                    self.session = response.session;
+                    self.imageURL = imageURL + '?rand=' + new Date().getTime();
+                }
                 loader.hide();
             })
             .catch((err) => {

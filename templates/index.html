@@ -29,7 +29,7 @@
                     <input hidden="hidden" type="file" name="image_file" id="image_file" accept="image/*">
                     <div class='slider-container'>
                         <div class="slidecontainer"><input type="range" min="1" max="100" value="50" id="scaling_factor" name="scaling_factor" class="slider"></div>
-                        <label for="scaling_factor" class="slider-label">Scaling Factor</label>
+                        <label for="scaling_factor" class="slider-label">Scaling Factor   <div class=" tooltip">🛈 <span class="tooltiptext">Modifies character density, a lower scaling factor results in more visibility of the ascii characters and poorer quality.</span></div></label>
                     </div>
                     <div class="actions">
                         <button @click.prevent="postImage" class="button" :disabled="imageFile === null && !session" :class="{disabled: imageFile === null && !session}">Generate</button>

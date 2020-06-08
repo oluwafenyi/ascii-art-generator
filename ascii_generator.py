@@ -1,10 +1,13 @@
 import os
 from base64 import b64encode
+from threading import Lock
 
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 from colour import Color
 
+
+LOCK = Lock()
 
 STATIC_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              'static')
@@ -128,6 +131,7 @@ def generate_image(
     :returns path: path of generated image
     """
 
+    LOCK.acquire()
     if gradient_style not in ('ltr', 'ttb'):
         raise ValueError('gradient_style should be one of "ltr" or "ttb"')
 
@@ -152,4 +156,5 @@ def generate_image(
     filename = 'ascii_art_' + rand + '.png'
     path = os.path.join(STATIC_FOLDER, filename)
     new_image.save(path)
+    LOCK.release()
     return path, filename

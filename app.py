@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm as Form
 from wtforms import FloatField
 from wtforms.validators import NumberRange
 
-from ascii_generator import generate_image
+from ascii_generator import generate_image, LOCK
 
 
 TEMP_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'temp')
@@ -41,7 +41,9 @@ def allowed_file(filename):
 
 
 def delete_file(path):
-    os.unlink(path)
+    with LOCK:
+        if os.path.exists(path):
+            os.unlink(path)
 
 
 @app.route('/', methods=('GET', 'POST'))
@@ -49,8 +51,6 @@ def index():
     if request.method == 'POST':
         f = request.files.get('image_file')
         if f and allowed_file(f.filename):
-            # ext = get_extension(f.filename)
-            # filename = f'temp.{ext}'
             filename = f.filename
             session['filename'] = filename
             path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -67,22 +67,25 @@ def index():
         form = ASCIIGenerationForm(formdata=request.form)
         if form.validate_on_submit():
             try:
+                print('here')
                 path, filename = generate_image(
                     path,
                     scaling_factor=form.scaling_factor.data,
                 )
             except FileNotFoundError:
                 error = 'image does not exist, please reupload'
-                return jsonify({'detail': error}), 404
+                return jsonify({'detail': error, 'status': 404}), 404
 
             delete_generated_task = Timer(300, delete_file, (path,))
             delete_generated_task.start()
             image_url = url_for('static', filename=filename)
-            return jsonify({'image_url': image_url, 'session': True}), 200
+            return jsonify(
+                {'image_url': image_url, 'session': True, 'status': 200}
+            ), 200
 
         else:
             errors = form.errors
-            return jsonify({'detail': errors}), 400
+            return jsonify({'detail': errors, 'status': 400}), 400
 
     else:
         form = ASCIIGenerationForm()
