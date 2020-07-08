@@ -4,7 +4,8 @@ from io import BytesIO
 from flask import (
     Flask, render_template, request, jsonify, redirect, url_for, Response)
 from flask_wtf import FlaskForm as Form
-from wtforms import FloatField
+from colour import Color
+from wtforms import FloatField, StringField
 from wtforms.validators import NumberRange
 from werkzeug.wsgi import FileWrapper
 
@@ -17,11 +18,23 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
 
+class ColorCheck:
+    def __call__(self, form, field):
+        color = field.data
+        try:
+            Color(color)
+            return True
+        except ValueError:
+            return False
+
+
 class ASCIIGenerationForm(Form):
     scaling_factor = FloatField(
         validators=[NumberRange(0.01, 1)],
         default=0.5,
     )
+    from_color = StringField(validators=[ColorCheck()], default='black')
+    to_color = StringField(validators=[ColorCheck()], default='black')
 
 
 def get_extension(filename):
@@ -52,6 +65,7 @@ def index():
             output = generate_image(
                 file_obj,
                 scaling_factor=form.scaling_factor.data,
+                gradient=(form.from_color.data, form.to_color.data)
             )
             response = Response(
                 FileWrapper(output), mimetype='image/png',

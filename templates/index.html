@@ -6,7 +6,8 @@
     <title>ASCII Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <script src={{ url_for('static', filename='vue.min.js') }}></script>
+    <script src={{ url_for('static', filename='vue.js') }}></script>
+    <script src={{ url_for('static', filename='vue-color.min.js') }}></script>
     <script src="{{ url_for('static', filename='vue-loading-overlay.js') }}"></script>
     <link href="{{ url_for('static', filename='vue-loading.css') }}" rel="stylesheet">
 </head>
@@ -34,6 +35,22 @@
                     <div class="actions">
                         <button @click.prevent="postImage" class="button" :disabled="imageFile === null" :class="{disabled: imageFile === null}">Generate</button>
                         <a :href="imageURL" download="ascii_art.png" class="button" :class="{disabled: !imageURL}">Download</a>
+                    </div>
+                    <div class="color-picker-btns">
+                        <div class="color-picker-btn">
+                            <div>
+                                <button class="color-picker" @click.prevent="pickColor(0)" :style="{ background: firstColor.hex }"></button>
+                                <label>gradient from</label>
+                            </div>
+                            <color-picker v-model="firstColor" v-if="firstPickerToggled" class="color-picker-panel"></color-picker>
+                        </div>
+                        <div class="color-picker-btn">
+                            <div>
+                                <button class="color-picker" @click.prevent="pickColor(1)" :style="{ background: secondColor.hex }"></button>
+                                <label> gradient to</label>
+                            </div>
+                            <color-picker v-model="secondColor" v-if="secondPickerToggled" class="color-picker-panel"></color-picker>
+                        </div>
                     </div>
                 </form>
             </div>

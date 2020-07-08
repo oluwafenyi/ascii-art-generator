@@ -112,17 +112,15 @@ label.image-upload {
     text-align: center;
     padding: 6px 12px;
     border-radius: 6px;
-
-    /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
     top: 100%;
     left: 50%;
-    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    margin-left: -60px;
 }
 
 .tooltip:hover .tooltiptext {
-visibility: visible;
+    visibility: visible;
 }
 
 .actions {
@@ -156,6 +154,42 @@ visibility: visible;
     cursor: default;
 }
 
+.color-picker-btns {
+    width: 15rem;
+    /* margin: 0 1.25rem; */
+    /* margin-top: 1.25rem; */
+    margin: auto;
+}
+
+.color-picker-btn {
+    display: inline-block;
+    text-align: center;
+}
+
+.color-picker-btn:nth-child(2) {
+    margin-left: 3rem;
+}
+
+.color-picker {
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px #fff solid;
+    position: relative;
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+
+.color-picker-panel {
+    position: absolute;
+    z-index: 1;
+}
+
+.color-picker:focus {
+    outline: none;
+}
+
 @media (max-width: 502px){
     form {
         text-align: center;
@@ -179,6 +213,10 @@ visibility: visible;
 
     .button {
         margin: 0 1rem;
+    }
+
+    .color-picker-btns {
+        margin-top: 1.25rem;
     }
 
 }

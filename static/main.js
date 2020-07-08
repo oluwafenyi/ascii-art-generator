@@ -1,9 +1,13 @@
 
 Vue.use(VueLoading);
+var Chrome = window.VueColor.Compact
 
 var vue = new Vue({
     el: '#display',
     delimiters: ['[[', ']]'],
+    components: {
+        'color-picker': Chrome,
+    },
     data: function() {
         return {
             imageFile: null,
@@ -12,6 +16,14 @@ var vue = new Vue({
             imageURL: null,
             background: '',
             blob: null,
+            firstColor: {
+                hex: '#000000'
+            },
+            secondColor: {
+                hex: '#000000'
+            },
+            firstPickerToggled: false,
+            secondPickerToggled: false,
         }
     },
     mounted: function() {
@@ -35,6 +47,8 @@ var vue = new Vue({
             data.append('csrf_token', this.csrfToken);
             data.append('scaling_factor', this.scalingFactor);
             data.append('image_file', this.imageFile);
+            data.append('from_color', this.firstColor.hex);
+            data.append('to_color', this.secondColor.hex);
 
             var self = this;
             fetch('/', { method: 'POST', body: data })
@@ -47,6 +61,13 @@ var vue = new Vue({
                 loader.hide();
                 alert('An error has occurred');
             });
+        },
+        pickColor: function(id) {
+            if (id === 0) {
+                this.firstPickerToggled = !this.firstPickerToggled;
+            } else {
+                this.secondPickerToggled = !this.secondPickerToggled;
+            }
         },
     },
     watch: {
