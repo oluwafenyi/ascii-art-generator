@@ -1,6 +1,5 @@
-import os
-from base64 import b64encode
 from threading import Lock
+from io import BytesIO
 
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
@@ -9,10 +8,6 @@ from colour import Color
 
 LOCK = Lock()
 
-STATIC_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                             'static')
-if not os.path.exists(STATIC_FOLDER):
-    os.mkdir(STATIC_FOLDER)
 
 FONT = ImageFont.load_default()
 CHAR_WIDTH, CHAR_HEIGHT = FONT.getsize('a')
@@ -114,11 +109,11 @@ def _draw_image_ltr(image: Image, chars: list, gradient: tuple) -> Image:
 
 
 def generate_image(
-    path: str,
+    file_obj: BytesIO,
     scaling_factor: float = 0.5,
     gradient=('black', 'black'),
     gradient_style='ttb'
-) -> str:
+) -> BytesIO:
     """
     main function for image generation, picture is stored in a temp folder
     adjacent this script
@@ -135,10 +130,8 @@ def generate_image(
     if gradient_style not in ('ltr', 'ttb'):
         raise ValueError('gradient_style should be one of "ltr" or "ttb"')
 
-    if not os.path.exists(path):
-        raise FileNotFoundError('file does not exist')
-
-    image = Image.open(path)
+    file_obj.seek(0)
+    image = Image.open(file_obj)
     image = resize_image(image, scaling_factor=scaling_factor)
     chars = pixels_to_chars(image)
 
@@ -152,9 +145,9 @@ def generate_image(
     elif gradient_style == 'ltr':
         new_image = _draw_image_ltr(new_image, chars, gradient)
 
-    rand = b64encode(os.urandom(8)).decode('utf-8').replace('.', '')
-    filename = 'ascii_art_' + rand + '.png'
-    path = os.path.join(STATIC_FOLDER, filename)
-    new_image.save(path)
+    output = BytesIO()
+    new_image.save(output, format='PNG')
+    output.seek(0)
+
     LOCK.release()
-    return path, filename
+    return output

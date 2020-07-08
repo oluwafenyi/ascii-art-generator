@@ -10,8 +10,8 @@ var vue = new Vue({
             csrfToken: '',
             scalingFactor: 0.5,
             imageURL: null,
-            session: false,
             background: '',
+            blob: null,
         }
     },
     mounted: function() {
@@ -20,7 +20,6 @@ var vue = new Vue({
         document.getElementById('image_file').addEventListener('change', function(e) {
             self.imageFile = e.target.files[0];
             self.imageURL = URL.createObjectURL(self.imageFile);
-            self.session = false;
         });
         document.getElementById('scaling_factor').addEventListener('input', function(e) {
             self.scalingFactor = e.target.value * 0.01;
@@ -39,13 +38,9 @@ var vue = new Vue({
 
             var self = this;
             fetch('/', { method: 'POST', body: data })
-            .then(response => response.json())
-            .then(response => {
-                if (response.status != 404) {
-                    var imageURL = response.image_url;
-                    self.session = response.session;
-                    self.imageURL = imageURL + '?rand=' + new Date().getTime();
-                }
+            .then(response => response.blob())
+            .then(blob => {
+                self.imageURL = URL.createObjectURL(blob);
                 loader.hide();
             })
             .catch((err) => {

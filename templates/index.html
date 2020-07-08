@@ -12,7 +12,7 @@
 </head>
 <body>
     <noscript>
-        <p>This app requires javascript enabled to function</p>
+        <h3>This app requires javascript enabled to function</h3>
     </noscript>
     <div id="app">
         <main>
@@ -32,7 +32,7 @@
                         <label for="scaling_factor" class="slider-label">Scaling Factor   <div class=" tooltip">🛈 <span class="tooltiptext">Modifies character density, a lower scaling factor results in more visibility of the ascii characters and poorer quality.</span></div></label>
                     </div>
                     <div class="actions">
-                        <button @click.prevent="postImage" class="button" :disabled="imageFile === null && !session" :class="{disabled: imageFile === null && !session}">Generate</button>
+                        <button @click.prevent="postImage" class="button" :disabled="imageFile === null" :class="{disabled: imageFile === null}">Generate</button>
                         <a :href="imageURL" download="ascii_art.png" class="button" :class="{disabled: !imageURL}">Download</a>
                     </div>
                 </form>
