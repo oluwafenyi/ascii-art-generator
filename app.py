@@ -2,10 +2,11 @@ import os
 from io import BytesIO
 
 from flask import (
-    Flask, render_template, request, jsonify, redirect, send_file, url_for)
+    Flask, render_template, request, jsonify, redirect, url_for, Response)
 from flask_wtf import FlaskForm as Form
 from wtforms import FloatField
 from wtforms.validators import NumberRange
+from werkzeug.wsgi import FileWrapper
 
 from ascii_generator import generate_image, LOCK
 
@@ -52,11 +53,12 @@ def index():
                 file_obj,
                 scaling_factor=form.scaling_factor.data,
             )
-            return send_file(
-                output, mimetype='image/png',
-                as_attachment=True,
-                attachment_filename='ascii_art.png'
-            )
+            response = Response(
+                FileWrapper(output), mimetype='image/png',
+                direct_passthrough=True)
+            response.headers['Content-Disposition'] = \
+                'attachment; filename="ascii_art.png"'
+            return response
 
         else:
             errors = form.errors
