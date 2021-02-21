@@ -29,6 +29,9 @@ class ColorCheck:
 
 
 class ASCIIGenerationForm(Form):
+    class Meta:
+        csrf = False
+
     scaling_factor = FloatField(
         validators=[NumberRange(0.01, 1)],
         default=0.5,

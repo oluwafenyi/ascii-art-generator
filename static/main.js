@@ -11,7 +11,6 @@ var vue = new Vue({
     data: function() {
         return {
             imageFile: null,
-            csrfToken: '',
             scalingFactor: 0.5,
             imageURL: null,
             background: '',
@@ -27,7 +26,6 @@ var vue = new Vue({
         }
     },
     mounted: function() {
-        this.csrfToken = document.getElementById('csrf_token').value;
         var self = this;
         document.getElementById('image_file').addEventListener('change', function(e) {
             self.imageFile = e.target.files[0];
@@ -44,7 +42,6 @@ var vue = new Vue({
                 canCancel: false,
             });
             var data = new FormData()
-            data.append('csrf_token', this.csrfToken);
             data.append('scaling_factor', this.scalingFactor);
             data.append('image_file', this.imageFile);
             data.append('from_color', this.firstColor.hex);
