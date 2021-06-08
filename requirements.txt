@@ -8,7 +8,7 @@ Jinja2==2.11.2
 MarkupSafe==1.1.1
 mccabe==0.6.1
 numpy==1.18.4
-Pillow==7.1.2
+Pillow==8.2.0
 pycodestyle==2.6.0
 pyflakes==2.2.0
 Werkzeug==1.0.1
